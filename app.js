@@ -293,14 +293,32 @@ els.list.addEventListener('keydown', (e) => {
 
 // ---------- 書き出し・読み込み ----------
 
-els.exportBtn.addEventListener('click', () => {
+els.exportBtn.addEventListener('click', async () => {
   if (data.habits.length === 0) {
     showDataMessage('書き出す習慣がまだありません');
     return;
   }
-  const blob = new Blob([exportData(data)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = el('a', { href: url, download: backupFileName(today) });
+  const json = exportData(data);
+  const name = backupFileName(today);
+
+  // スマホでは共有画面を出し、保存先（ファイル・Google ドライブなど）を選べるようにする
+  const file = new File([json], name, { type: 'application/json' });
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    try {
+      await navigator.share({ files: [file] });
+      showDataMessage('書き出しました。保存先を確認してください。', true);
+      return;
+    } catch (err) {
+      if (err.name === 'AbortError') {
+        showDataMessage('書き出しをやめました');
+        return;
+      }
+      // 共有に失敗したときは、下のダウンロードに切り替える
+    }
+  }
+
+  const url = URL.createObjectURL(new Blob([json], { type: 'application/json' }));
+  const a = el('a', { href: url, download: name });
   document.body.append(a);
   a.click();
   a.remove();

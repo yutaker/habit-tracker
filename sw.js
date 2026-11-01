@@ -1,6 +1,6 @@
 // サービスワーカー：アプリのファイルを端末に保存し、圏外でも開けるようにする。
 // ファイルを直したら CACHE_NAME の数字を上げる（古い保存分が入れ替わる）。
-const CACHE_NAME = 'habit-tracker-v4';
+const CACHE_NAME = 'habit-tracker-v5';
 
 const APP_FILES = [
   './',
